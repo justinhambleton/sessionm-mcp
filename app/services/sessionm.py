@@ -1,7 +1,7 @@
 import os
 import httpx
 
-if os.getenv("ENV", "development") != "production":
+if os.getenv("NODE_ENV", "development") != "production":
     try:
         from dotenv import load_dotenv
         load_dotenv()
