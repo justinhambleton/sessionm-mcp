@@ -34,7 +34,7 @@ async def freeform_chat(
                 id_type = "email" if "@" in prompt else "phone"
                 print(f"🔍 Attempting to resolve via {id_type}: {prompt}")
                 context = await resolve_user_context(prompt, id_type)
-                ChatSessionManager.set_user(session_id, context.member_id, context.model_dump())
+                ChatSessionManager.set_user(session_id, context.member_id, context.dict())
             else:
                 raise HTTPException(status_code=400, detail="User not identified in session.")
 
@@ -44,7 +44,7 @@ async def freeform_chat(
             "Only use this data to answer questions. If information is missing, say so.\n"
         )
         if isinstance(context, MemberContext):
-            context_dict = context.model_dump()
+            context_dict = context.dict()
         else:
             context_dict = context
 
