@@ -1,7 +1,12 @@
 import os
 import httpx
-from dotenv import load_dotenv
-load_dotenv()
+
+if os.getenv("ENV", "development") != "production":
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
 
 from app.models import (
     MemberContext,
