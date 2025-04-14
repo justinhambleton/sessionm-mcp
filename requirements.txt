@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+httpx
+python-dateutil>=2.8.2
