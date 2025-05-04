@@ -15,7 +15,7 @@ from langchain_core.callbacks import (
 from langchain_core.documents import Document
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
-from pydantic import ConfigDict, model_validator
+from langchain_core.pydantic_v1 import root_validator
 
 from langchain.chains import ReduceDocumentsChain
 from langchain.chains.base import Chain
@@ -37,7 +37,7 @@ from langchain.chains.qa_with_sources.map_reduce_prompt import (
     message=(
         "This class is deprecated. Refer to this guide on retrieval and question "
         "answering with sources: "
-        "https://python.langchain.com/docs/how_to/qa_sources/"
+        "https://python.langchain.com/v0.2/docs/how_to/qa_sources/"
     ),
 )
 class BaseQAWithSourcesChain(Chain, ABC):
@@ -97,10 +97,9 @@ class BaseQAWithSourcesChain(Chain, ABC):
         )
         return cls(combine_documents_chain=combine_documents_chain, **kwargs)
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="forbid",
-    )
+    class Config:
+        arbitrary_types_allowed = True
+        extra = "forbid"
 
     @property
     def input_keys(self) -> List[str]:
@@ -121,9 +120,8 @@ class BaseQAWithSourcesChain(Chain, ABC):
             _output_keys = _output_keys + ["source_documents"]
         return _output_keys
 
-    @model_validator(mode="before")
-    @classmethod
-    def validate_naming(cls, values: Dict) -> Any:
+    @root_validator(pre=True)
+    def validate_naming(cls, values: Dict) -> Dict:
         """Fix backwards compatibility in naming."""
         if "combine_document_chain" in values:
             values["combine_documents_chain"] = values.pop("combine_document_chain")
@@ -216,7 +214,7 @@ class BaseQAWithSourcesChain(Chain, ABC):
     message=(
         "This class is deprecated. Refer to this guide on retrieval and question "
         "answering with sources: "
-        "https://python.langchain.com/docs/how_to/qa_sources/"
+        "https://python.langchain.com/v0.2/docs/how_to/qa_sources/"
     ),
 )
 class QAWithSourcesChain(BaseQAWithSourcesChain):

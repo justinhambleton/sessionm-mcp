@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import context, langchain, reason, freeform
+from app.routes import context, langchain, reason, freeform, auth
 
 app = FastAPI()
 
@@ -19,3 +19,4 @@ app.include_router(context.router, prefix="/context")
 app.include_router(langchain.router)
 app.include_router(reason.router)
 app.include_router(freeform.router)
+app.include_router(auth.router)

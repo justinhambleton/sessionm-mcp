@@ -9,7 +9,6 @@ from typing import Any, List, Optional, Sequence, Tuple
 from langchain_core.callbacks.manager import Callbacks
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import PromptTemplate
-from pydantic import ConfigDict
 
 from langchain.chains.llm import LLMChain
 from langchain.evaluation.qa.eval_prompt import CONTEXT_PROMPT, COT_PROMPT, PROMPT
@@ -73,9 +72,8 @@ class QAEvalChain(LLMChain, StringEvaluator, LLMEvalChain):
 
     output_key: str = "results"  #: :meta private:
 
-    model_config = ConfigDict(
-        extra="ignore",
-    )
+    class Config:
+        extra = "ignore"
 
     @classmethod
     def is_lc_serializable(cls) -> bool:
@@ -222,9 +220,8 @@ class ContextQAEvalChain(LLMChain, StringEvaluator, LLMEvalChain):
         """Whether the chain requires an input string."""
         return True
 
-    model_config = ConfigDict(
-        extra="ignore",
-    )
+    class Config:
+        extra = "ignore"
 
     @classmethod
     def _validate_input_vars(cls, prompt: PromptTemplate) -> None:

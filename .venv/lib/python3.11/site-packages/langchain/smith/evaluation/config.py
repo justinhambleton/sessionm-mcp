@@ -5,10 +5,10 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
+from langchain_core.pydantic_v1 import BaseModel, Field
 from langsmith import RunEvaluator
 from langsmith.evaluation.evaluator import EvaluationResult, EvaluationResults
 from langsmith.schemas import Example, Run
-from pydantic import BaseModel, ConfigDict, Field
 
 from langchain.evaluation.criteria.eval_chain import CRITERIA_TYPE
 from langchain.evaluation.embedding_distance.base import (
@@ -156,9 +156,8 @@ class RunEvalConfig(BaseModel):
     eval_llm: Optional[BaseLanguageModel] = None
     """The language model to pass to any evaluators that require one."""
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-    )
+    class Config:
+        arbitrary_types_allowed = True
 
     class Criteria(SingleKeyEvalConfig):
         """Configuration for a reference-free criteria evaluator.
@@ -218,9 +217,8 @@ class RunEvalConfig(BaseModel):
         embeddings: Optional[Embeddings] = None
         distance_metric: Optional[EmbeddingDistanceEnum] = None
 
-        model_config = ConfigDict(
-            arbitrary_types_allowed=True,
-        )
+        class Config:
+            arbitrary_types_allowed = True
 
     class StringDistance(SingleKeyEvalConfig):
         """Configuration for a string distance evaluator.

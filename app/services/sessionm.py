@@ -36,27 +36,39 @@ async def resolve_user_context(identifier: str, type: str = "user_id") -> Member
         url = f"{CORE_API_BASE_URL}/priv/v1/apps/{CORE_API_KEY}/users/{identifier}"
         params = None
     else:
-        url = f"{CORE_API_BASE_URL}/priv/v1/apps/{CORE_API_KEY}/users/search"
+        url = f"{CORE_API_BASE_URL}/priv/v1/apps/{CORE_API_KEY}/users/search_users"
         params = {
-            "user[user_profile]": "true",
-            "expand_incentives": "true",
-            "show_identifiers": "true"
+            "mobile_number": identifier if type == "phone" else None,
+            "advanced_search_params[user_profile]": "true"
         }
+        # Remove None values
+        params = {k: v for k, v in params.items() if v is not None}
         if type == "email":
             params["email"] = identifier
-        elif type == "phone":
-            params["mobile_number"] = identifier
+
+        import base64
+        userpass = f"{CORE_API_KEY}:{CORE_API_SECRET}"
+        auth_header = base64.b64encode(userpass.encode()).decode()
+        headers = {
+            "Authorization": f"Basic {auth_header}"
+        }
+        print("SessionM request URL:", url)
+        print("SessionM request params:", params)
+        print("SessionM request headers:", headers)
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, auth=(CORE_API_KEY, CORE_API_SECRET), params=params)
+        response = await client.get(url, params=params, headers=headers)
+        print("SessionM response status:", response.status_code)
+        print("SessionM response body:", response.text)
         response.raise_for_status()
         data = response.json()
 
-    user = data.get("user")
-    if not user:
+    players = data.get("players", [])
+    if not players:
         raise ValueError("User not found")
+    user = players[0]
 
-    print("✅ User object loaded successfully")
+    print("User object loaded successfully")
     print("Lookup type:", type)
     print("User ID:", user["id"])
     print("Email:", user.get("email"))
@@ -83,21 +95,37 @@ async def resolve_user_context(identifier: str, type: str = "user_id") -> Member
             resets_at=user.get("tier_resets_at")
         )
 
-    print("🔄 Fetching offers...")
-    offers = await get_user_offers(user["id"])
-    print(f"✅ Offers loaded: {len(offers)}")
+    try:
+        print("Fetching offers...")
+        offers = await get_user_offers(user["user_id"])
+        print(f"Offers loaded: {len(offers)}")
+    except Exception as e:
+        print("Error fetching offers:", e)
+        offers = []
 
-    print("🔄 Fetching campaigns...")
-    campaigns = await get_user_campaigns(user["id"])
-    print(f"✅ Campaigns loaded: {len(campaigns)}")
+    try:
+        print("Fetching campaigns...")
+        campaigns = await get_user_campaigns(user["user_id"])
+        print(f"Campaigns loaded: {len(campaigns)}")
+    except Exception as e:
+        print("Error fetching campaigns:", e)
+        campaigns = []
 
-    print("🔄 Fetching point audit logs...")
-    audit_logs = await get_user_point_audit_logs(user["id"])
-    print(f"✅ Audit logs loaded: {len(audit_logs)}")
+    try:
+        print("Fetching point audit logs...")
+        audit_logs = await get_user_point_audit_logs(user["user_id"])
+        print(f"Audit logs loaded: {len(audit_logs)}")
+    except Exception as e:
+        logging.error(f"Error fetching point audit logs: {e}")
+        audit_logs = []
 
-    print("🔄 Fetching timeline events...")
-    timeline = await get_user_timeline_events(user["id"])
-    print(f"✅ Timeline events loaded: {len(timeline)}")
+    try:
+        print("Fetching timeline events...")
+        timeline = await get_user_timeline_events(user["user_id"])
+        print(f"Timeline events loaded: {len(timeline)}")
+    except Exception as e:
+        logging.error(f"Error fetching timeline events: {e}")
+        timeline = []
 
     return MemberContext(
         member_id=user["id"],

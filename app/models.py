@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Any
 
 class PointAccount(BaseModel):
@@ -24,7 +24,7 @@ class Offer(BaseModel):
     is_redeemable: bool
     start_date: Optional[str]
     expiration_date: Optional[str]
-    media: List[OfferMedia] = []
+    media: List[OfferMedia] = Field(default_factory=list)
 
 class Campaign(BaseModel):
     campaign_id: int
@@ -78,7 +78,7 @@ class MemberContext(BaseModel):
     tier_qualifying_points: float
     redeemable_points: float
     point_accounts: List[PointAccount]
-    recent_activity: List[PointAuditLog] = []
+    recent_activity: List[PointAuditLog] = Field(default_factory=list)
     offers: List[Offer]
-    campaigns: List[Campaign] = []
-    timeline: List[TimelineEvent] = []
+    campaigns: List[Campaign] = Field(default_factory=list)
+    timeline: List[TimelineEvent] = Field(default_factory=list)

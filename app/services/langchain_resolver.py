@@ -6,8 +6,9 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableSequence
 
-load_dotenv()
-print("🔐 OPENAI_API_KEY:", os.getenv("OPENAI_API_KEY"))
+from pathlib import Path
+load_dotenv(dotenv_path=Path(__file__).parent.parent / '.env')
+print('OPENAI_API_KEY at runtime:', os.getenv('OPENAI_API_KEY'))
 
 model = ChatOpenAI(temperature=0)
 

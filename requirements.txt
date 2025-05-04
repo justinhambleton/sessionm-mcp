@@ -3,8 +3,12 @@ uvicorn[standard]
 httpx
 python-dateutil>=2.8.2
 openai>=1.0.0
-pydantic>=1.10,<2.0
-langchain>=0.1.0
+pydantic>=2.7.0
+langchain>=0.3.23
 langchain-openai>=0.0.1
+langchain-core>=0.3.51
+langchain-community>=0.3.21
 langgraph>=0.0.20
 markdown-it-py
+pyjwt
+python-multipart
